@@ -64,5 +64,75 @@ namespace Negocio
             }
             
         }
+
+        public void agregar(Articulo articulo)
+        {
+            try
+            {
+                datos.setearConsulta("insert into articulos (codigo, nombre, descripcion, idMarca, idCategoria, ImagenUrl, precio) values(@codigo, @nombre,@descripcion,@idMarca,@idCategoria,@imagenUrl,@precio);");
+                datos.setearParametro("@codigo", articulo.Codigo);
+                datos.setearParametro("@nombre", articulo.Nombre);
+                datos.setearParametro("@descripcion", articulo.Descripcion);
+                datos.setearParametro("@idMarca", articulo.Marca.Id);
+                datos.setearParametro("@idCategoria", articulo.Categoria.Id);
+                datos.setearParametro("@imagenUrl", articulo.UrlImagen);
+                datos.setearParametro("@precio", articulo.Precio);
+                datos.EjecutarAccion();
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+            finally
+            {
+                datos.CerrarConexion();
+            }
+        }
+
+        public void editar(Articulo articulo)
+        {
+            try
+            {
+                datos.setearConsulta("update Articulos set codigo= @codigo, Nombre= @nombre, Descripcion= @descripcion, IdMarca= @idMarca, IdCategoria= @idCategoria, ImagenUrl= @imagenUrl, precio = @precio where id= @id;");
+                datos.setearParametro("@codigo", articulo.Codigo);
+                datos.setearParametro("@nombre", articulo.Nombre);
+                datos.setearParametro("@descripcion", articulo.Descripcion);
+                datos.setearParametro("@idMarca", articulo.Marca.Id);
+                datos.setearParametro("@idCategoria", articulo.Categoria.Id);
+                datos.setearParametro("@imagenUrl", articulo.UrlImagen);
+                datos.setearParametro("@precio", articulo.Precio);
+                datos.setearParametro("@id", articulo.Id);
+                datos.EjecutarAccion();
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+            finally
+            {
+                datos.CerrarConexion();
+            }
+        }
+
+        public void eliminar(Articulo articulo)
+        {
+            try
+            {
+                datos.setearConsulta("delete from articulos where id= @id;");
+                datos.setearParametro("@id", articulo.Id);
+                datos.EjecutarAccion();
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+            finally
+            {
+                datos.CerrarConexion();
+            }
+        }
     }
 }

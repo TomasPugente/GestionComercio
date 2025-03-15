@@ -32,6 +32,13 @@ namespace Negocio
             Lector= Comando.ExecuteReader();
         }
 
+        public void EjecutarAccion()
+        {
+            Comando.Connection = Conexion;
+            Conexion.Open();
+            Comando.ExecuteNonQuery();
+        }
+
         public void CerrarConexion()
         {
             if(Lector != null)
