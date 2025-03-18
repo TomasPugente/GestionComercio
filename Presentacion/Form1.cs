@@ -14,8 +14,13 @@ namespace Presentacion
 {
     public partial class FmCatalogo: Form
     {
-        List<Articulo> listaArticulos;
-        ArticuloNegocio negocio = new ArticuloNegocio();
+        private List<Articulo> listaArticulos;
+        private ArticuloNegocio negocio = new ArticuloNegocio();
+        private Marca marca;
+        private Categoria categoria;
+        private MarcaNegocio marcaNegocio= new MarcaNegocio();
+        private CategoriaNegocio categoriaNegocio= new CategoriaNegocio();
+
         public FmCatalogo()
         {
             InitializeComponent();
@@ -27,6 +32,13 @@ namespace Presentacion
             Articulo seleccionado=(Articulo) dgvArticulos.CurrentRow.DataBoundItem;
             cargarImagen(seleccionado.UrlImagen);
             ocultarColumnas();
+
+            cboClase.Items.Add("Codigo");
+            cboClase.Items.Add("Descripcion");
+            cboClase.Items.Add("Marca");
+            cboClase.Items.Add("Categoria");
+            cboClase.Items.Add("Precio");
+
         }
 
         private void CargarInformacion()
@@ -51,6 +63,7 @@ namespace Presentacion
         {
             dgvArticulos.Columns["id"].Visible = false;
             dgvArticulos.Columns["urlImagen"].Visible = false;
+            dgvArticulos.Columns["Precio"].Visible = false;
         }
         private void cargarImagen(string urlImagen)
         {
@@ -76,20 +89,6 @@ namespace Presentacion
             
         }
 
-        private void dgvArticulos_CellMouseClick(object sender, DataGridViewCellMouseEventArgs e)
-        {
-            try
-            {
-                Articulo aux = (Articulo)dgvArticulos.CurrentRow.DataBoundItem;
-                cargarImagen(aux.UrlImagen);
-            }
-            catch (Exception ex)
-            {
-
-                MessageBox.Show(ex.ToString()) ;
-            }
-            
-        }
 
         private void btnAgregar_Click(object sender, EventArgs e)
         {
@@ -129,6 +128,125 @@ namespace Presentacion
                 negocio.eliminar((Articulo)dgvArticulos.CurrentRow.DataBoundItem);
             MessageBox.Show("Eliminado Correctamente", "Eliminado");
             CargarInformacion();
+        }
+
+        private void txtNombre_Click(object sender, EventArgs e)
+        {
+            txtNombre.Text = "";
+        }
+
+        private void txtNombre_TextChanged(object sender, EventArgs e)
+        {
+            
+            List<Articulo> listaFiltro = new List<Articulo>();
+
+            try
+            {   
+                if(txtNombre.Text.Length > 1)
+                {
+                listaFiltro = listaArticulos.FindAll(x => x.Nombre.ToLower().Contains(txtNombre.Text.ToLower()));
+                }
+                else
+                {   
+                    listaFiltro = listaArticulos;
+                }
+                dgvArticulos.DataSource = null;
+                dgvArticulos.DataSource = listaFiltro;
+                ocultarColumnas();
+                
+            }
+            catch (Exception ex)
+            {
+
+                MessageBox.Show(ex.ToString());
+            }
+            
+
+            
+        }
+
+        private void dgvArticulos_SelectionChanged(object sender, EventArgs e)
+        {
+
+            try
+            {   
+                
+                if (dgvArticulos.CurrentRow != null)
+                {
+                    Articulo aux = (Articulo)dgvArticulos.CurrentRow.DataBoundItem;
+                    cargarImagen(aux.UrlImagen);
+                }
+            }
+            catch (Exception ex)
+            {
+
+                MessageBox.Show(ex.ToString());
+            }
+           
+        }
+
+        private void cboClase_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            cboTipo.DataSource = null;
+            cboTipo.Items.Clear();
+            lblTipo.Visible = true;
+            cboTipo.Visible = true;
+            txtFiltro.Visible = true;
+            lblFiltro.Visible = true;
+            switch (cboClase.Text)
+            {
+                case "Codigo":
+                    lblTipo.Visible = false;
+                    cboTipo.Visible = false;
+                    break;
+                case "Descripcion":
+                    cboTipo.Items.Add("Empieza con");
+                    cboTipo.Items.Add("Termina con");
+                    cboTipo.Items.Add("Contiene");
+                    break;
+                case "Marca":
+                    txtFiltro.Visible = false;
+                    lblFiltro.Visible = false;
+                    cboTipo.DataSource = marcaNegocio.listar();
+                    break;
+                case "Categoria":
+                    txtFiltro.Visible = false;
+                    lblFiltro.Visible = false;
+                    cboTipo.DataSource = categoriaNegocio.listar();
+                    break;
+                default:
+                    cboTipo.Items.Clear();
+                    cboTipo.Items.Add("Mayor a");
+                    cboTipo.Items.Add("Menor a");
+                    cboTipo.Items.Add("Igual");
+                    break;
+                
+            
+            }
+        }
+
+        private void btnBusquedaAvanzada_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if(cboClase.Text == "Marca")
+                    listaArticulos = negocio.filtrar(cboClase.Text, cboTipo.Text, txtFiltro.Text, (Marca)cboTipo.SelectedItem);
+                else if(cboClase.Text== "Categoria")
+                    listaArticulos = negocio.filtrar(cboClase.Text, cboTipo.Text, txtFiltro.Text,null ,(Categoria)cboTipo.SelectedItem);
+                else
+                    listaArticulos = negocio.filtrar(cboClase.Text, cboTipo.Text, txtFiltro.Text);
+
+                dgvArticulos.DataSource = null;
+                dgvArticulos.DataSource = listaArticulos;
+                ocultarColumnas();
+
+            }
+            catch (Exception ex)
+            {
+                
+                MessageBox.Show(ex.ToString());
+            }
+            
         }
     }
 }

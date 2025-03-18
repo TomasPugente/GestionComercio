@@ -134,5 +134,67 @@ namespace Negocio
                 datos.CerrarConexion();
             }
         }
+        public List<Articulo> filtrar(String clase, String tipo= null, String filtro= null, Marca marca=null, Categoria categoria=null)
+        {
+            try
+            {
+                String consulta = "select a.id id, a.codigo codigo, a.nombre, a.Descripcion descripcion, m.id idMarca, m.Descripcion descripcionMarca, c.id idCategoria, c.Descripcion descripcionCategoria, a.ImagenUrl urlImagen, a.Precio precio\r\nfrom marcas m, categorias c, articulos a where m.Id= a.IdMarca and c.id = a.IdCategoria and ";
+                switch (clase)
+                {
+                    case "Codigo":
+                        consulta+="a.codigo like '"+filtro+"'";
+                        break;
+                    case "Descripcion":
+                        switch (tipo)
+                        {
+                            case "Empieza con":
+                                consulta += "a.descripcion like '" + filtro + "%'";
+                                break;
+                            case "Termina con":
+                                consulta += "a.descripcion like '%" + filtro + "'";
+                                break;
+                            default:
+                                consulta += "a.descripcion like '%" + filtro + "%'";
+                                break;
+                        }
+                        break;
+                    case "Marca":
+                        consulta += "a.idMarca= " + marca.Id;
+                        break;
+                    case "Categoria":
+                        consulta += "a.idCategoria=" + categoria.Id;
+                        break;
+                    default:
+                        switch (tipo)
+                        {
+                            case "Mayor a":
+                                consulta += "a.precio>" + filtro;
+                                break;
+                            case "Menor a":
+                                consulta += "a.precio <" + filtro;
+                                break;
+                            default:
+                                consulta += "a.precio like " + filtro;
+                                break;
+                        }
+                        break;
+                }
+                datos.setearConsulta(consulta);
+                datos.EjecutarLectura();
+                cargarLista();
+
+                return listaArticulos;
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+            finally
+            {
+                datos.CerrarConexion();
+            }
+
+        }
     }
 }

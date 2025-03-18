@@ -35,8 +35,14 @@ namespace Presentacion
                 CategoriaNegocio categoriaNegocio = new CategoriaNegocio();
                 cbxCategoria.DataSource = categoriaNegocio.listar();
                 cbxMarca.DataSource = marcaNegocio.listar();
+                cbxCategoria.ValueMember = "id";
+                cbxCategoria.DisplayMember= "Descripcion";
+                cbxMarca.ValueMember = "id";
+                cbxMarca.DisplayMember = "Descripcion";
                 if (articulo != null)
                 {
+                    cbxMarca.SelectedValue = articulo.Marca.Id;
+                    cbxCategoria.SelectedValue = articulo.Categoria.Id;
                     txtNombre.Text = articulo.Nombre;
                     txtCodigo.Text = articulo.Codigo;
                     txtDescripcion.Text = articulo.Descripcion;
